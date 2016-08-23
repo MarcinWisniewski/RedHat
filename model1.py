@@ -6,8 +6,6 @@ from sklearn.cross_validation import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import auc, roc_curve
 
-from sklearn.preprocessing import OneHotEncoder, LabelBinarizer
-from scipy.sparse import csr_matrix
 import matplotlib.pyplot as plt
 
 
@@ -20,13 +18,13 @@ people_path = os.path.expanduser('~/data/kaggle/redhat/people.csv')
 print '...reading files'
 train_events = pd.read_csv(train_events_path, usecols=['people_id', 'activity_category',
                                                        'char_1',	'char_2',	'char_3',
-                                                       #'char_4',	'char_5', 'char_6',
+                                                       'char_4',	'char_5', 'char_6',
                                                        'char_7',	'char_8',	'char_9',
                                                        'char_10', 'outcome'
                                                        ])
 test_events = pd.read_csv(test_events_path, usecols=['people_id', 'activity_category',
                                                      'char_1',	'char_2',	'char_3',
-                                                     #'char_4',	'char_5', 'char_6',
+                                                     'char_4',	'char_5', 'char_6',
                                                      'char_7',	'char_8',	'char_9',
                                                      'char_10', 'activity_id'
                                                      ])
@@ -34,11 +32,11 @@ test_events = pd.read_csv(test_events_path, usecols=['people_id', 'activity_cate
 
 people = pd.read_csv(people_path, usecols=['people_id', 'group_1', 'char_1', 'char_2', 'char_3',
                                            'char_4', 'char_5', 'char_6', 'char_7',
-                                           #'char_8', 'char_9', 'char_10', 'char_11',
-                                           #'char_12', 'char_13', 'char_14', 'char_15',
-                                           #'char_17', 'char_18', 'char_19', 'char_20',
-                                           #'char_21', 'char_22', 'char_23', 'char_24',
-                                           #'char_25', 'char_26', 'char_27', 'char_28',
+                                           'char_8', 'char_9', 'char_10', 'char_11',
+                                           'char_12', 'char_13', 'char_14', 'char_15',
+                                           'char_17', 'char_18', 'char_19', 'char_20',
+                                           'char_21', 'char_22', 'char_23', 'char_24',
+                                           'char_25', 'char_26', 'char_27', 'char_28',
                                            'char_29', 'char_30', 'char_31', 'char_32',
                                            'char_33', 'char_34', 'char_35', 'char_36',
                                            'char_37', 'char_38'])
@@ -103,5 +101,5 @@ print '...saving submission'
 submission = pd.DataFrame()
 submission['outcome'] = preds
 submission['activity_id'] = activity_id
-submission.to_csv('submission' + time.strftime('%m_%d_%H_%M') + '.csv', index=False, float_format='%.3f')
+submission.to_csv('submission_' + time.strftime('%m_%d_%H_%M') + '.csv', index=False, float_format='%.3f')
 
