@@ -74,7 +74,7 @@ print '...learning'
 rf = RandomForestClassifier()
 rf.fit(X_train, y_train)
 predictions = rf.predict_proba(X_test)
-predicted_proba = np.argmax(predictions, axis=1)
+predicted_proba = predictions[:, 1]
 fpr, tpr, thresholds = roc_curve(y_test, predicted_proba, pos_label=1)
 print 'AUC: %f' % auc(fpr, tpr)
 
@@ -95,7 +95,7 @@ for column in test_events.columns:
 test_events_people = pd.merge(parsed_test_events, parsed_people, how='left', on='people_id', left_index=True)
 print '...predicting '
 preds = rf.predict_proba(test_events_people.drop(labels=['people_id'], axis=1))
-preds = np.argmax(preds, axis=1)
+preds = preds[:, 1]
 
 print '...saving submission'
 submission = pd.DataFrame()
