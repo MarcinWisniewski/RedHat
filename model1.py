@@ -5,11 +5,27 @@ import datetime
 from sklearn.cross_validation import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import auc, roc_curve
+import xgboost as xgb
 
 import matplotlib.pyplot as plt
 
 
 time = datetime.datetime.now()
+params = {}
+params['objective'] = 'binary:logistic'
+params['booster'] = 'gbtree'
+params['eval_metric'] = 'auc'
+#params['eta'] = 0.0201
+params['learning_rate'] = 0.15
+params['max_depth'] = 4
+params['subsample'] = 0.9
+params['colsample_bytree'] = 0.7
+params['verbose'] = 0
+#params['show_progress'] = True
+#params['print_every_n'] = 1
+#params['maximise'] = False
+
+
 train_events_path = os.path.expanduser('~/data/kaggle/redhat/act_train.csv')
 test_events_path = os.path.expanduser('~/data/kaggle/redhat/act_test.csv')
 
@@ -71,10 +87,15 @@ print '...splitting data'
 X_train, X_test, y_train, y_test = train_test_split(features, classes, test_size=0.33, random_state=42)
 
 print '...learning'
-rf = RandomForestClassifier()
-rf.fit(X_train, y_train)
-predictions = rf.predict_proba(X_test)
-predicted_proba = predictions[:, 1]
+
+d_train = xgb.DMatrix(X_train, label=y_train, silent=True)
+d_valid = xgb.DMatrix(X_test, label=y_test, silent=True)
+
+watchlist = [(d_valid, 'valid')]
+
+clf = xgb.train(params, d_train, 3000, evals=watchlist)
+predictions = clf.predict(xgb.DMatrix(X_test))
+predicted_proba = predictions
 fpr, tpr, thresholds = roc_curve(y_test, predicted_proba, pos_label=1)
 print 'AUC: %f' % auc(fpr, tpr)
 
@@ -93,9 +114,9 @@ for column in test_events.columns:
 
 
 test_events_people = pd.merge(parsed_test_events, parsed_people, how='left', on='people_id', left_index=True)
+d_test = xgb.DMatrix(test_events_people.drop(labels=['people_id'], axis=1))
 print '...predicting '
-preds = rf.predict_proba(test_events_people.drop(labels=['people_id'], axis=1))
-preds = preds[:, 1]
+preds = clf.predict(d_test)
 
 print '...saving submission'
 submission = pd.DataFrame()
